@@ -15,6 +15,8 @@
  */
 package com.android.launcher3.taskbar.allapps;
 
+import app.lawnchair.preferences2.PreferenceCacheExtensionsKt;
+import app.lawnchair.preferences2.PreferenceManager2;
 import static com.android.launcher3.model.data.AppInfo.EMPTY_ARRAY;
 
 import android.view.View;
@@ -130,6 +132,10 @@ public final class TaskbarAllAppsController {
     }
 
     private void toggle(boolean showKeyboard) {
+        if (PreferenceCacheExtensionsKt.firstCached(PreferenceManager2.INSTANCE.get(
+                mControllers.taskbarActivityContext).getDeckLayout())) {
+            return;
+        }
         if (isOpen()) {
             mSlideInView.close(true);
         } else {

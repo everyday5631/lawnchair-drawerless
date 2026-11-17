@@ -16,6 +16,8 @@
 
 package com.android.launcher3.taskbar;
 
+import app.lawnchair.preferences2.PreferenceCacheExtensionsKt;
+import app.lawnchair.preferences2.PreferenceManager2;
 import static android.window.DesktopModeFlags.ENABLE_TASKBAR_RECENTS_LAYOUT_TRANSITION;
 
 import static com.android.launcher3.config.FeatureFlags.enableTaskbarPinning;
@@ -63,6 +65,10 @@ public class TaskbarViewCallbacks {
 
     /** Trigger All Apps button click action. */
     public void triggerAllAppsButtonClick(View v) {
+        if (PreferenceCacheExtensionsKt.firstCached(
+                PreferenceManager2.INSTANCE.get(mActivity).getDeckLayout())) {
+            return;
+        }
         InteractionJankMonitorWrapper.begin(v, Cuj.CUJ_LAUNCHER_OPEN_ALL_APPS,
                 /* tag= */ "TASKBAR_BUTTON");
         mActivity.getStatsLogManager().logger().log(LAUNCHER_TASKBAR_ALLAPPS_BUTTON_TAP);

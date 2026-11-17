@@ -227,6 +227,8 @@ import com.android.launcher3.testing.shared.TestProtocol;
 import com.android.launcher3.touch.AllAppsSwipeController;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.touch.ItemLongClickListener;
+import app.lawnchair.preferences2.PreferenceCacheExtensionsKt;
+import app.lawnchair.preferences2.PreferenceManager2;
 import com.android.launcher3.util.ActivityResultInfo;
 import com.android.launcher3.util.BackPressHandler;
 import com.android.launcher3.util.CannedAnimationCoordinator;
@@ -1682,7 +1684,19 @@ public class Launcher extends StatefulActivity<LauncherState>
         toggleAllApps(/* alreadyOnHome= */ true, focusSearch);
     }
 
+    /**
+     * Returns true if the app drawer has been turned off (Deck layout), in which case every app
+     * lives on the home screen and All Apps must not be reachable.
+     */
+    public boolean isAppDrawerDisabled() {
+        return PreferenceCacheExtensionsKt.firstCached(
+                PreferenceManager2.INSTANCE.get(this).getDeckLayout());
+    }
+
     private void toggleAllApps(boolean alreadyOnHome, boolean focusSearch) {
+        if (isAppDrawerDisabled()) {
+            return;
+        }
         if (getStateManager().isInStableState(ALL_APPS)) {
             getStateManager().goToState(NORMAL, alreadyOnHome);
         } else {
@@ -1712,6 +1726,9 @@ public class Launcher extends StatefulActivity<LauncherState>
     }
 
     private void showAllAppsWithSelectedTabFromIntent(boolean alreadyOnHome, int tab) {
+        if (isAppDrawerDisabled()) {
+            return;
+        }
         AbstractFloatingView.closeAllOpenViews(this);
         getStateManager().goToState(ALL_APPS, alreadyOnHome);
         if (mAppsView.isSearching()) {
